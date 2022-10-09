@@ -9,7 +9,6 @@ export const HeaderContainer = styled.header`
 
   .address-cart {
     display: flex;
-    gap: 1rem;
   }
   .address {
     display: flex;
@@ -31,6 +30,7 @@ export const HeaderContainer = styled.header`
   }
   .cart {
     cursor: pointer;
+    margin-left: 1rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -41,5 +41,19 @@ export const HeaderContainer = styled.header`
     svg {
       color: ${(props) => props.theme['yellow-dark']};
     }
+  }
+  span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin: -0.3rem 0 0 -0.6rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: ${(props) => props.theme.white};
+
+    border-radius: 50%;
+    background: ${(props) => props.theme['yellow-dark']};
   }
 `

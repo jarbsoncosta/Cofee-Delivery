@@ -5,6 +5,7 @@ export const ProductsContainer = styled.div`
   max-width: 70rem;
   h1 {
     margin-top: 2rem;
+    color: ${(props) => props.theme['gray-800']};
   }
   .cards {
     padding: 3.37rem 0;
@@ -62,7 +63,7 @@ export const ValueqQantity = styled.div`
     align-items: center;
     height: 2.37rem;
     strong {
-      font-size: 1.5rem;
+      font-size: 1.3rem;
     }
   }
 
@@ -99,6 +100,10 @@ export const ValueqQantity = styled.div`
     width: 2.37rem;
     height: 2.37rem;
     background: ${(props) => props.theme['purple-dark']};
+    transition: 1s;
+    &:hover {
+      background: ${(props) => props.theme.purple};
+    }
   }
   svg {
     color: ${(props) => props.theme.white};

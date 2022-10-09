@@ -3,6 +3,7 @@ import coffee from '../../../../assets/coffee/coffee.svg'
 import { ShoppingCart } from 'phosphor-react'
 import { FiPlus, FiMinus } from 'react-icons/fi'
 import { formatPrice } from '../../../../utils/formatPrice'
+import { useCart } from '../../../../hooks/useCart'
 
 const products = [
   {
@@ -76,6 +77,10 @@ const products = [
 ]
 
 export function Products() {
+  const { addProduct } = useCart()
+  function handleAddProduct(id: number) {
+    addProduct(id)
+  }
   return (
     <ProductsContainer>
       <h1>Nossos cafés</h1>
@@ -103,7 +108,11 @@ export function Products() {
                     <FiPlus size={16} />
                   </div>
                   <div className="buttonCart">
-                    <ShoppingCart size={25} weight="fill" />
+                    <ShoppingCart
+                      onClick={() => handleAddProduct(product.id)}
+                      size={25}
+                      weight="fill"
+                    />
                   </div>
                 </div>
               </ValueqQantity>
