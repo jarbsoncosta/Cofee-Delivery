@@ -1,9 +1,12 @@
 import { ProductsContainer, ValueqQantity } from './styles'
 import coffee from '../../../../assets/coffee/coffee.svg'
-import { ShoppingCart } from 'phosphor-react'
+import { PlusCircle, ShoppingCart } from 'phosphor-react'
 import { FiPlus, FiMinus } from 'react-icons/fi'
 import { formatPrice } from '../../../../utils/formatPrice'
 import { useCart } from '../../../../hooks/useCart'
+import { useState } from 'react'
+import { Cart } from '../../../Cart'
+import { Link } from 'react-router-dom'
 
 const products = [
   {
@@ -75,9 +78,16 @@ const products = [
     ],
   },
 ]
-
+interface CartItemAmount {
+  [key: number]: number
+}
 export function Products() {
-  const { addProduct } = useCart()
+  const { addProduct, cart } = useCart()
+  const cartItemsAmount = cart.reduce((sumAmount, product) => {
+    sumAmount[product.id] = product.amount
+    return sumAmount
+  }, {} as CartItemAmount)
+
   function handleAddProduct(id: number) {
     addProduct(id)
   }
@@ -103,12 +113,13 @@ export function Products() {
                 </div>
                 <div className="amount-button-cart">
                   <div className="amount">
-                    <FiMinus size={16} />
-                    <span>{1}</span>
-                    <FiPlus size={16} />
+                    <Link to="/carrinho" title="Ir para o carrinho">
+                      <ShoppingCart size={25} />
+                    </Link>
+                    <span>{cartItemsAmount[product.id] || 0}</span>
                   </div>
                   <div className="buttonCart">
-                    <ShoppingCart
+                    <PlusCircle
                       onClick={() => handleAddProduct(product.id)}
                       size={25}
                       weight="fill"

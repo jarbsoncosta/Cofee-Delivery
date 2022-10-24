@@ -6,37 +6,38 @@ import {
   Money,
   Trash,
 } from 'phosphor-react'
-import { useState } from 'react'
-import { Address, Container, FormRequest, Items, Payment } from './styles'
-import { useForm } from 'react-hook-form'
-import * as yup from 'yup'
-import { yupResolver } from '@hookform/resolvers/yup'
+
+import {
+  Address,
+  Container,
+  ContainerPayment,
+  FormRequest,
+  Items,
+  TransactionType,
+  TransactionTypeButton,
+} from './styles'
+import { useForm, Controller } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as z from 'zod'
 import { FiMinus, FiPlus } from 'react-icons/fi'
 import { formatPrice } from '../../utils/formatPrice'
 import { Product, useCart } from '../../hooks/useCart'
+import { useNavigate } from 'react-router-dom'
 
-interface AddressProps {
-  cep: string
-  road: string
-  district: string
-  number: string
-  complement?: string
-  city: string
-  uf: string
-}
-const validatePartner = yup.object({
-  cep: yup.string().required('Campo obrigatório'),
-  road: yup.string().required('Campo obrigatório'),
-  district: yup.string().required('Campo obrigatório'),
-  number: yup.string().required('Campo obrigatório'),
-  city: yup.string().required('Campo obrigatório'),
-  uf: yup.string().required('Campo obrigatório'),
+const newAddressProps = z.object({
+  cep: z.string().min(1, '* Campo obrigatório'),
+  road: z.string().min(1, '* Campo obrigatório'),
+  district: z.string().min(1, '* Campo obrigatório'),
+  number: z.string().min(1, '* Campo obrigatório'),
+  city: z.string().min(1, '* Campo obrigatório'),
+  uf: z.string().min(1, '* Campo obrigatório'),
+  complement: z.string().optional(),
+  payment: z.enum(['Cartão de crédito', 'Cartão de dédito', 'Dinheiro']),
 })
 
 export function Cart() {
-  const { cart, removeProduct, updateProductAmount } = useCart()
-  const [payment, setPayment] = useState('')
-  const [address, setAddress] = useState({})
+  const history = useNavigate()
+  const { cart, removeProduct, updateProductAmount, finishCart } = useCart()
 
   function onBlurCep(e: any) {
     const { value } = e.target
@@ -50,7 +51,6 @@ export function Cart() {
     fetch(`https://viacep.com.br/ws/${cep}/json/`)
       .then((res) => res.json())
       .then((data) => {
-        console.log(data)
         setValue('city', data.localidade)
         setValue('district', data.bairro)
         setValue('road', data.logradouro)
@@ -60,13 +60,19 @@ export function Cart() {
       })
   }
 
+  type SearchFormInputs = z.infer<typeof newAddressProps>
+
   const {
     register,
     handleSubmit,
+    reset,
+    control,
     formState: { errors },
     setValue,
     setFocus,
-  } = useForm<AddressProps>({ resolver: yupResolver(validatePartner) })
+  } = useForm<SearchFormInputs>({
+    resolver: zodResolver(newAddressProps),
+  })
 
   function handleProductIncrement(product: Product) {
     const IncrementArguments = {
@@ -99,10 +105,25 @@ export function Cart() {
     return sumTotal
   }, 0)
 
+  function handleCreateNewOrder(data: SearchFormInputs) {
+    finishCart({
+      cep: data.cep,
+      road: data.road,
+      district: data.district,
+      number: data.number,
+      city: data.city,
+      uf: data.uf,
+      complement: data.complement,
+      payment: data.payment,
+      items: cart,
+    })
+    reset()
+  }
+
   return (
     <Container>
       {cart.length > 0 ? (
-        <>
+        <form onSubmit={handleSubmit(handleCreateNewOrder)}>
           <FormRequest>
             <div>
               <h3>Complete seu pedido</h3>
@@ -118,7 +139,13 @@ export function Cart() {
                     onBlur={onBlurCep}
                     placeholder="CEP"
                   />
-                  <input type="text" {...register('road')} placeholder="Rua" />
+                  {errors.cep?.message && <span>{errors.cep?.message}</span>}
+                  <input
+                    type="text"
+                    disabled
+                    {...register('road')}
+                    placeholder="Rua"
+                  />
                 </div>
                 <div className="group2">
                   <input
@@ -128,6 +155,7 @@ export function Cart() {
                   />
                   <input
                     type="text"
+                    disabled
                     {...register('complement')}
                     placeholder="Complemento"
                   />
@@ -135,57 +163,69 @@ export function Cart() {
                 <div className="group3">
                   <input
                     type="text"
+                    disabled
                     {...register('district')}
                     placeholder="Bairro"
                   />
                   <input
                     type="text"
+                    disabled
                     {...register('city')}
                     placeholder="Cidade"
                   />
-                  <input type="text" {...register('uf')} placeholder="UF" />
+                  <input
+                    disabled
+                    type="text"
+                    {...register('uf')}
+                    placeholder="UF"
+                  />
                 </div>
               </Address>
             </div>
-            <Payment>
-              <div>
-                <span>
-                  <CurrencyDollar size={18} weight="fill" />
-                  Pagamento
-                </span>
-                <p>Informe o endereço onde deseja receber seu pedido</p>
-                <div className="btn-payment">
-                  <label htmlFor="credit">
-                    <input
-                      type="radio"
-                      id="credit"
-                      name="payment"
-                      onClick={() => setPayment('CARTÃO DE CRÉDITO')}
-                    />
-                    <CreditCard size={15} weight="fill" /> CARTÃO DE CRÉDITO
-                  </label>
-                  <label htmlFor="debito">
-                    <input
-                      type="radio"
-                      id="debito"
-                      name="payment"
-                      onClick={() => setPayment('CARTÃO DE DÉBITO')}
-                    />
-                    <Bank size={15} weight="fill" />
-                    CARTÃO DE DÉBITO
-                  </label>
-                  <label htmlFor="money">
-                    <input
-                      type="radio"
-                      id="money"
-                      name="payment"
-                      onClick={() => setPayment('DINHEIRO')}
-                    />
-                    <Money size={15} weight="fill" /> DINHEIRO
-                  </label>
-                </div>
-              </div>
-            </Payment>
+
+            <Controller
+              control={control}
+              name="payment"
+              render={({ field }) => {
+                return (
+                  <ContainerPayment>
+                    <span>
+                      <CurrencyDollar size={18} /> Pagamento
+                    </span>
+                    <p>
+                      O pagamento é feito na entrega. Escolha a forma que deseja
+                      pagar
+                    </p>
+                    <TransactionType
+                      onValueChange={field.onChange}
+                      value={field.value}
+                    >
+                      <TransactionTypeButton
+                        {...register('payment')}
+                        value="Cartão de crédito"
+                      >
+                        <CreditCard size={18} /> CARTÃO DE CRÉDITO
+                      </TransactionTypeButton>
+
+                      <TransactionTypeButton
+                        {...register('payment')}
+                        value="Cartão de dédito"
+                      >
+                        <Bank size={18} />
+                        CARTÃO DE DÉBITO
+                      </TransactionTypeButton>
+                      <TransactionTypeButton
+                        {...register('payment')}
+                        value="Dinheiro"
+                      >
+                        <Money size={18} />
+                        DINHEIRO
+                      </TransactionTypeButton>
+                    </TransactionType>
+                  </ContainerPayment>
+                )
+              }}
+            />
           </FormRequest>
           <div className="items">
             <h3>Complete seu pedido</h3>
@@ -193,7 +233,7 @@ export function Cart() {
               {cart.map((item) => {
                 return (
                   <>
-                    <div className="cart">
+                    <div key={item.id} className="cart">
                       <div className="divImg">
                         <img src={item.image} alt="" />
                       </div>
@@ -204,22 +244,24 @@ export function Cart() {
                         </div>
                         <div className="amount-button-cart">
                           <div className="amount">
-                            <button
-                              className="btn-amount"
-                              disabled={item.amount <= 1}
-                              onClick={() => handleProductDecrement(item)}
-                            >
-                              <FiMinus size={16} />
-                            </button>
+                            <div className="btn-amount">
+                              <FiMinus
+                                role="button"
+                                onClick={() => handleProductDecrement(item)}
+                                size={16}
+                              />
+                            </div>
                             <span>{item.amount}</span>
-                            <button
-                              className="btn-amount"
-                              onClick={() => handleProductIncrement(item)}
-                            >
-                              <FiPlus size={16} />
-                            </button>
+                            <div className="btn-amount">
+                              <FiPlus
+                                role="button"
+                                onClick={() => handleProductIncrement(item)}
+                                size={16}
+                              />
+                            </div>
                           </div>
                           <button
+                            type="button"
                             onClick={() => handleRemoveProduct(item.id)}
                             className="buttonCart"
                           >
@@ -246,10 +288,12 @@ export function Cart() {
                   <strong>{formatPrice(total + 3.5)} </strong>
                 </div>
               </div>
-              <button className="btnSubmit"> CONFIRMAR PEDIDO</button>
+              <button type="submit" className="btnSubmit">
+                CONFIRMAR PEDIDO
+              </button>
             </Items>
           </div>
-        </>
+        </form>
       ) : (
         <h3>Seu carrinho está vazio</h3>
       )}

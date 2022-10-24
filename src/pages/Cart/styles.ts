@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+import * as RadioGroup from '@radix-ui/react-radio-group'
 
 export const Container = styled.main`
   padding: 0 10rem;
@@ -16,12 +17,16 @@ export const Container = styled.main`
       margin-bottom: 1rem;
     }
   }
+  form {
+    display: flex;
+    gap: 2rem;
+  }
   @media (max-width: 1153px) {
     flex-wrap: wrap-reverse;
   }
 `
 
-export const FormRequest = styled.form`
+export const FormRequest = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -37,7 +42,8 @@ export const Address = styled.div`
   padding: 2.5rem;
   background: ${(props) => props.theme['gray-100']};
   border-radius: 6px;
-  width: 40rem;
+  width: 100%;
+  max-width: 40rem;
   height: 23.25rem;
   gap: 1rem;
   span {
@@ -65,11 +71,16 @@ export const Address = styled.div`
       height: 2.5rem;
       padding-left: 0.5rem;
       :first-child {
+        width: 100%;
         max-width: 12.5rem;
       }
       ::placeholder {
         padding-left: 0.5rem;
       }
+    }
+    span {
+      font-size: 0.875rem;
+      color: red;
     }
   }
   .group2 {
@@ -84,7 +95,8 @@ export const Address = styled.div`
       height: 2.5rem;
       padding-left: 0.5rem;
       :first-child {
-        width: 12.5rem;
+        width: 100%;
+        max-width: 12.5rem;
       }
       ::placeholder {
         padding-left: 0.5rem;
@@ -106,7 +118,8 @@ export const Address = styled.div`
         width: 12.5rem;
       }
       :last-child {
-        width: 3.75rem;
+        width: 100%;
+        max-width: 3.75rem;
       }
       ::placeholder {
         padding-left: 0.5rem;
@@ -115,56 +128,64 @@ export const Address = styled.div`
   }
 `
 
-export const Payment = styled.div`
-  div {
-    background: ${(props) => props.theme['gray-100']};
+export const ContainerPayment = styled.div`
+  background: ${(props) => props.theme['gray-100']};
+  padding: 2.5rem;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+
+  span {
     display: flex;
-    flex-direction: column;
-    padding: 2.5rem;
-    border-radius: 6px;
-    width: 40rem;
-    height: 13rem;
-    span {
-      display: flex;
-      align-items: center;
-      font-size: 1rem;
-      gap: 0.5rem;
-      color: ${(props) => props.theme['gray-800']};
-      svg {
-        color: ${(props) => props.theme['purple-dark']};
-      }
-    }
-    p {
-      margin-left: 1.6rem;
-    }
+    align-items: center;
+    gap: 0.5rem;
+    color: ${(props) => props.theme['gray-800']};
+  }
+  svg {
+    color: ${(props) => props.theme.purple};
+  }
+  p {
+    margin: 0 0 1rem 1.6rem;
+  }
+`
 
-    .btn-payment {
-      margin-top: 2rem;
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      width: 100%;
-      padding: 0;
-      gap: 1rem;
+export const TransactionType = styled(RadioGroup.Root)`
+  background: ${(props) => props.theme['gray-100']};
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 2rem;
+`
 
-      label {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-        border-radius: 6px;
-        width: 100%;
-        height: 3rem;
-        border: 0;
-        font-size: 0.75rem;
-        background: ${(props) => props.theme['gray-400']};
-        color: ${(props) => props.theme['gray-700']};
-        cursor: pointer;
-        svg {
-          color: ${(props) => props.theme['purple-dark']};
-        }
-      }
-    }
+export const TransactionTypeButton = styled(RadioGroup.Item)`
+  background: ${(props) => props.theme['gray-400']};
+  width: 100%;
+  display: flex;
+  height: 3.18rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 0;
+  color: ${(props) => props.theme['gray-700']};
+  font-size: 0.75rem;
+
+  svg {
+    color: ${(props) => props.theme.purple};
+  }
+
+  &[data-state='unchecked']:hover {
+    background: ${(props) => props.theme['gray-500']};
+    transition: background-color 0.2s;
+  }
+
+  &[data-state='checked'] {
+    color: ${(props) => props.theme['gray-700']};
+    background: ${(props) => props.theme['purple-light']};
+    border: 1px solid ${(props) => props.theme.purple};
+    box-shadow: none;
   }
 `
 export const Items = styled.main`

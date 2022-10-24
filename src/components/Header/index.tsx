@@ -6,6 +6,7 @@ import { useCart } from '../../hooks/useCart'
 
 export function Header() {
   const { cart } = useCart()
+
   return (
     <HeaderContainer>
       <Link to="/" style={{ display: 'flex' }}>
@@ -14,7 +15,7 @@ export function Header() {
       <div className="address-cart">
         <div className="address">
           <MapPin size={20} weight="fill" />
-          <p>Natal-RN</p>
+          <p>Natal, RN </p>
         </div>
         <Link to="/carrinho" className="cart">
           <ShoppingCart size={25} weight="fill" />

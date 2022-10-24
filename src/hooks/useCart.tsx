@@ -1,35 +1,13 @@
-import { createContext, ReactNode, useContext, useState } from 'react'
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from 'react'
 import coffee from '../assets/coffee/coffee.svg'
+import { toast, ToastContainer } from 'react-toastify'
 
-interface CartProviderProps {
-  children: ReactNode
-}
-
-export interface Product {
-  id: number
-  name: string
-  price: number
-  description: string
-  image: string
-  amount: number
-  quantity: number
-  categories: [
-    {
-      id: number
-      name: string
-    },
-  ]
-}
-interface UpdateProductAmount {
-  productId: number
-  amount: number
-}
-interface CartContextData {
-  cart: Product[]
-  addProduct: (productId: number) => Promise<void>
-  removeProduct: (productId: number) => void
-  updateProductAmount: ({ productId, amount }: UpdateProductAmount) => void
-}
 const productsArray = [
   {
     id: 1,
@@ -101,17 +79,64 @@ const productsArray = [
   },
 ]
 
+interface CartProviderProps {
+  children: ReactNode
+}
+
+export interface Product {
+  id: number
+  name: string
+  price: number
+  description: string
+  image: string
+  amount: number
+  quantity: number
+  categories: [
+    {
+      id: number
+      name: string
+    },
+  ]
+}
+interface AddressPaymentProps {
+  cep: string
+  road: string
+  district: string
+  number: string
+  city: string
+  uf: string
+  complement: string | undefined
+  payment: 'Cartão de crédito' | 'Cartão de dédito' | 'Dinheiro'
+  items: Product[]
+}
+interface UpdateProductAmount {
+  productId: number
+  amount: number
+}
+
+interface CartContextData {
+  cart: Product[]
+  finish: AddressPaymentProps
+  addProduct: (productId: number) => Promise<void>
+  removeProduct: (productId: number) => void
+  updateProductAmount: ({ productId, amount }: UpdateProductAmount) => void
+  finishCart: (items: AddressPaymentProps) => void
+}
+
 const CartContext = createContext<CartContextData>({} as CartContextData)
 
 export function CartProductProvider({ children }: CartProviderProps) {
   const [cart, setCart] = useState(() => {
     const storagedCart = localStorage.getItem('@Coffe:cart')
-
     if (storagedCart) {
       return JSON.parse(storagedCart)
     }
     return []
   })
+
+  useEffect(() => {
+    setCart(cart)
+  }, [cart])
 
   const addProduct = async (productId: number) => {
     try {
@@ -127,32 +152,26 @@ export function CartProductProvider({ children }: CartProviderProps) {
           '@Coffe:cart',
           JSON.stringify([...cart, { ...stock, amount: 1 }]),
         )
-        alert('Adicionado')
+        toast.success('Adicionado')
         return
       }
       if (productAlreadyInCart) {
-        const stock = productsArray.find((product) => product.id === productId)
+        const updatedCart = cart.map((cartItem: Product) =>
+          cartItem.id === productId
+            ? {
+                ...cartItem,
+                amount: Number(cartItem.amount) + 1,
+              }
+            : cartItem,
+        )
 
-        if (stock.quantity > productAlreadyInCart.amount) {
-          const updatedCart = cart.map((cartItem: Product) =>
-            cartItem.id === productId
-              ? {
-                  ...cartItem,
-                  amount: Number(cartItem.amount) + 1,
-                }
-              : cartItem,
-          )
-
-          setCart(updatedCart)
-          localStorage.setItem('@Coffe:cart', JSON.stringify(updatedCart))
-          alert('Mais uma unidade desse produto foi adicionado')
-          return
-        } else {
-          alert('Quantidade solicitada fora de estoque')
-        }
+        setCart(updatedCart)
+        localStorage.setItem('@Coffe:cart', JSON.stringify(updatedCart))
+        toast.success('Mais uma unidade desse produto foi adicionado')
+        return
       }
     } catch {
-      alert('Erro na adição do produto')
+      toast.success('Erro na adição do produto')
     }
   }
 
@@ -162,7 +181,7 @@ export function CartProductProvider({ children }: CartProviderProps) {
         (cartProduct: Product) => cartProduct.id === productId,
       )
       if (!productExists) {
-        alert('Erro na remoção do produto')
+        toast.error('Erro na remoção do produto')
         return
       }
 
@@ -172,7 +191,7 @@ export function CartProductProvider({ children }: CartProviderProps) {
       setCart(updatedCart)
       localStorage.setItem('@Coffe:cart', JSON.stringify(updatedCart))
     } catch {
-      alert('Erro na remoção do produto')
+      toast.error('Erro na remoção do produto')
     }
   }
 
@@ -182,16 +201,7 @@ export function CartProductProvider({ children }: CartProviderProps) {
   }: UpdateProductAmount) => {
     try {
       if (amount < 1) {
-        alert('Erro na alteração de quantidade do produto')
-        return
-      }
-
-      const response = productsArray.find((product) => product.id === productId)
-      const productAmount = response.quantity
-      const stockIsFree = amount > productAmount
-
-      if (stockIsFree) {
-        alert('Quantidade solicitada fora de estoque')
+        toast.error('Erro na alteração de quantidade do produto')
         return
       }
 
@@ -199,7 +209,7 @@ export function CartProductProvider({ children }: CartProviderProps) {
         (cartProduct: Product) => cartProduct.id === productId,
       )
       if (!productExists) {
-        alert('Erro na alteração de quantidade do produto')
+        toast.error('Erro na alteração de quantidade do produto')
         return
       }
 
@@ -214,13 +224,37 @@ export function CartProductProvider({ children }: CartProviderProps) {
       setCart(updatedCart)
       localStorage.setItem('@Coffe:cart', JSON.stringify(updatedCart))
     } catch {
-      alert('Erro na alteração de quantidade do produto')
+      toast.error('Erro na alteração de quantidade do produto')
     }
+  }
+
+  const [finish, setFinish] = useState(() => {
+    const storagedCart = localStorage.getItem('@Coffe:finish')
+
+    if (storagedCart) {
+      return JSON.parse(storagedCart)
+    }
+    return []
+  })
+
+  function finishCart(items: AddressPaymentProps) {
+    setFinish({ ...items })
+    toast.success('Pedido realizado com sucesso')
+    localStorage.setItem('@Coffe:finish', JSON.stringify({ ...items }))
+    localStorage.removeItem('@Coffe:cart')
+    window.location.replace('/pedido')
   }
 
   return (
     <CartContext.Provider
-      value={{ addProduct, removeProduct, updateProductAmount, cart }}
+      value={{
+        addProduct,
+        removeProduct,
+        updateProductAmount,
+        cart,
+        finishCart,
+        finish,
+      }}
     >
       {children}
     </CartContext.Provider>

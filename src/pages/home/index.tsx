@@ -1,3 +1,4 @@
+import { useCart } from '../../hooks/useCart'
 import { Banner } from './components/Banner'
 import { Products } from './components/Products'
 import { Container } from './styles'
