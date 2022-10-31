@@ -1,8 +1,8 @@
 import { HeaderContainer } from './styles'
-import logoImg from '../../assets/logo.svg'
 import { ShoppingCart, MapPin } from 'phosphor-react'
 import { Link } from 'react-router-dom'
 import { useCart } from '../../hooks/useCart'
+import logoImg from '../../assets/logo.svg'
 
 export function Header() {
   const { cart } = useCart()
