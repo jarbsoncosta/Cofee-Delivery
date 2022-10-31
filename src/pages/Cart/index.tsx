@@ -36,7 +36,7 @@ const newAddressProps = z.object({
 })
 
 export function Cart() {
-  const history = useNavigate()
+  // const history = useNavigate()
   const { cart, removeProduct, updateProductAmount, finishCart } = useCart()
 
   function onBlurCep(e: any) {
@@ -139,7 +139,11 @@ export function Cart() {
                     onBlur={onBlurCep}
                     placeholder="CEP"
                   />
-                  {errors.cep?.message && <span>{errors.cep?.message}</span>}
+                  {errors.cep?.message && (
+                    <span style={{ fontSize: '0.875rem', color: 'red' }}>
+                      {errors.cep?.message}
+                    </span>
+                  )}
                   <input
                     type="text"
                     disabled
@@ -160,6 +164,11 @@ export function Cart() {
                     placeholder="Complemento"
                   />
                 </div>
+                {errors.number?.message && (
+                  <span style={{ fontSize: '0.875rem', color: 'red' }}>
+                    {errors.number?.message}
+                  </span>
+                )}
                 <div className="group3">
                   <input
                     type="text"

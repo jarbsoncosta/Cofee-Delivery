@@ -44,7 +44,7 @@ export const Address = styled.div`
   border-radius: 6px;
   width: 100%;
   max-width: 40rem;
-  height: 23.25rem;
+
   gap: 1rem;
   span {
     display: flex;
@@ -77,10 +77,6 @@ export const Address = styled.div`
       ::placeholder {
         padding-left: 0.5rem;
       }
-    }
-    span {
-      font-size: 0.875rem;
-      color: red;
     }
   }
   .group2 {
