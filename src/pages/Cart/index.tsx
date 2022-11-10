@@ -22,7 +22,6 @@ import * as z from 'zod'
 import { FiMinus, FiPlus } from 'react-icons/fi'
 import { formatPrice } from '../../utils/formatPrice'
 import { Product, useCart } from '../../hooks/useCart'
-import { useNavigate } from 'react-router-dom'
 
 const newAddressProps = z.object({
   cep: z.string().min(1, '* Campo obrigatório'),
@@ -116,6 +115,7 @@ export function Cart() {
       complement: data.complement,
       payment: data.payment,
       items: cart,
+      total,
     })
     reset()
   }

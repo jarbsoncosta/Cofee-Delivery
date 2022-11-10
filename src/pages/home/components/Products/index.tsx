@@ -8,81 +8,11 @@ import { useState } from 'react'
 import { Cart } from '../../../Cart'
 import { Link } from 'react-router-dom'
 
-const products = [
-  {
-    id: 1,
-    name: 'Expresso Tradicional',
-    image: coffee,
-    description: 'O tradicional café feito com água quente e grãos moídos',
-    price: 9.9,
-    quantity: 5,
-    categories: [
-      {
-        id: 1,
-        name: 'TRADICIONAL',
-      },
-    ],
-  },
-  {
-    id: 2,
-    name: 'Café com Leite',
-    image: coffee,
-    description: 'Meio a meio de expresso tradicional com leite vaporizado',
-    price: 9.9,
-    quantity: 5,
-    categories: [
-      {
-        id: 1,
-        name: 'TRADICIONAL',
-      },
-      {
-        id: 2,
-        name: 'COM LEITE',
-      },
-    ],
-  },
-  {
-    id: 3,
-    name: 'Café com Leite',
-    image: coffee,
-    description: 'Meio a meio de expresso tradicional com leite vaporizado',
-    price: 9.9,
-    quantity: 5,
-    categories: [
-      {
-        id: 1,
-        name: 'TRADICIONAL',
-      },
-      {
-        id: 2,
-        name: 'COM LEITE',
-      },
-    ],
-  },
-  {
-    id: 4,
-    name: 'Café com Leite',
-    image: coffee,
-    description: 'Meio a meio de expresso tradicional com leite vaporizado',
-    price: 9.9,
-    quantity: 5,
-    categories: [
-      {
-        id: 1,
-        name: 'TRADICIONAL',
-      },
-      {
-        id: 2,
-        name: 'COM LEITE',
-      },
-    ],
-  },
-]
 interface CartItemAmount {
   [key: number]: number
 }
 export function Products() {
-  const { addProduct, cart } = useCart()
+  const { addProduct, cart, productsArray } = useCart()
   const cartItemsAmount = cart.reduce((sumAmount, product) => {
     sumAmount[product.id] = product.amount
     return sumAmount
@@ -96,7 +26,7 @@ export function Products() {
       <h1>Nossos cafés</h1>
 
       <div className="cards">
-        {products.map((product) => {
+        {productsArray.map((product) => {
           return (
             <div key={product.id} className="card">
               <img src={coffee} alt="" />

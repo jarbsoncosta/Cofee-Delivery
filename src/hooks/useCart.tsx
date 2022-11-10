@@ -6,7 +6,7 @@ import {
   useState,
 } from 'react'
 import coffee from '../assets/coffee/coffee.svg'
-import { toast, ToastContainer } from 'react-toastify'
+import { toast } from 'react-toastify'
 
 const productsArray = [
   {
@@ -15,7 +15,7 @@ const productsArray = [
     image: coffee,
     description: 'O tradicional café feito com água quente e grãos moídos',
     price: 9.9,
-    quantity: 5,
+    quantity: 1,
     categories: [
       {
         id: 1,
@@ -28,8 +28,8 @@ const productsArray = [
     name: 'Café com Leite',
     image: coffee,
     description: 'Meio a meio de expresso tradicional com leite vaporizado',
-    price: 9.9,
-    quantity: 5,
+    price: 10.5,
+    quantity: 3,
     categories: [
       {
         id: 1,
@@ -43,11 +43,11 @@ const productsArray = [
   },
   {
     id: 3,
-    name: 'Café com Leite',
+    name: 'Expresso Americano',
     image: coffee,
-    description: 'Meio a meio de expresso tradicional com leite vaporizado',
-    price: 9.9,
-    quantity: 5,
+    description: 'Expresso diluído, menos intenso que o tradicional',
+    price: 8.99,
+    quantity: 6,
     categories: [
       {
         id: 1,
@@ -61,10 +61,10 @@ const productsArray = [
   },
   {
     id: 4,
-    name: 'Café com Leite',
+    name: 'Expresso Cremoso',
     image: coffee,
-    description: 'Meio a meio de expresso tradicional com leite vaporizado',
-    price: 9.9,
+    description: 'Café expresso tradicional com espuma cremosa',
+    price: 15,
     quantity: 5,
     categories: [
       {
@@ -108,6 +108,7 @@ interface AddressPaymentProps {
   complement: string | undefined
   payment: 'Cartão de crédito' | 'Cartão de dédito' | 'Dinheiro'
   items: Product[]
+  total: number
 }
 interface UpdateProductAmount {
   productId: number
@@ -121,6 +122,7 @@ interface CartContextData {
   removeProduct: (productId: number) => void
   updateProductAmount: ({ productId, amount }: UpdateProductAmount) => void
   finishCart: (items: AddressPaymentProps) => void
+  productsArray: Product[]
 }
 
 const CartContext = createContext<CartContextData>({} as CartContextData)
@@ -254,6 +256,7 @@ export function CartProductProvider({ children }: CartProviderProps) {
         cart,
         finishCart,
         finish,
+        productsArray,
       }}
     >
       {children}
